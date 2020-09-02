@@ -101,7 +101,13 @@ func deepMerge(dst, src reflect.Value, visited map[uintptr]*visit, depth int, co
 		}
 	case reflect.Map:
 		if dst.IsNil() && !src.IsNil() {
-			dst.Set(reflect.MakeMap(dst.Type()))
+			if dst.CanSet() {
+				dst.Set(reflect.MakeMap(dst.Type()))
+			} else {
+				dst = src
+				return
+			}
+			// dst.Set(reflect.MakeMap(dst.Type()))
 		}
 
 		if src.Kind() != reflect.Map {
